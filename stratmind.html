@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c0a08">
+<title>StratMind · Consultor Estratégico</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230c0a08' width='180' height='180' rx='36'/><text x='90' y='120' text-anchor='middle' font-size='90'>♟</text></svg>">
+<meta name="apple-mobile-web-app-title" content="StratMind">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Source+Code+Pro:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0a08;
+  --surface: #13100d;
+  --surface-2: #1a1612;
+  --ink: #b8ad9e;
+  --ink-dim: #6b6256;
+  --ink-bright: #ede4d4;
+  --red: #b5342a;
+  --red-soft: #b5342a22;
+  --gold: #c4972a;
+  --gold-soft: #c4972a18;
+  --gold-glow: #c4972a44;
+  --border: #221e18;
+  --border-accent: #352e24;
+  --font-display: 'Crimson Pro', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Source Code Pro', monospace;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ APP SHELL ═══ */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* ═══ HEADER ═══ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.app-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--red);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600;
+  color: #fff;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 400;
+  color: var(--ink-bright);
+}
+
+.logo-text span { color: var(--gold); }
+
+/* ═══ TABS ═══ */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+  background: none; border-top: none; border-left: none; border-right: none;
+}
+
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ═══ PANELS ═══ */
+.panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.panel.active { display: flex; }
+
+/* ═══ LIBRARY PANEL ═══ */
+.library-search {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink-bright);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-input::placeholder { color: var(--ink-dim); }
+.search-input:focus { border-color: var(--gold); }
+
+.library-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Module cards */
+.module-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.module-card:hover { border-color: var(--border-accent); }
+
+.module-header {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.module-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.module-tag.clasicos { background: var(--red-soft); color: var(--red); }
+.module-tag.juegos { background: #5b9bd522; color: #5b9bd5; }
+.module-tag.sistemas { background: #81b29a22; color: #81b29a; }
+.module-tag.antifragil { background: var(--gold-soft); color: var(--gold); }
+.module-tag.core { background: #c9a0dc22; color: #c9a0dc; }
+.module-tag.rendimiento { background: #e07a5f22; color: #e07a5f; }
+
+.module-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--ink-bright);
+  flex: 1;
+  margin: 0 12px;
+}
+
+.module-arrow {
+  color: var(--ink-dim);
+  font-size: 14px;
+  transition: transform 0.3s;
+}
+
+.module-card.open .module-arrow { transform: rotate(90deg); }
+
+.module-body {
+  display: none;
+  padding: 0 16px 16px;
+}
+
+.module-card.open .module-body { display: block; }
+
+.principle {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.principle:last-child { border-bottom: none; }
+
+.principle-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.principle em { color: var(--red); font-style: italic; }
+.principle strong { color: var(--ink-bright); }
+
+/* ═══ CHAT PANEL ═══ */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.msg {
+  margin-bottom: 16px;
+  max-width: 88%;
+  animation: msgIn 0.3s ease-out;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.user {
+  margin-left: auto;
+  background: var(--red-soft);
+  border: 1px solid var(--red);
+  border-radius: 14px 14px 4px 14px;
+  padding: 10px 14px;
+  color: var(--ink-bright);
+  font-size: 14px;
+}
+
+.msg.assistant {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 14px 4px;
+  padding: 12px 16px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.msg.assistant strong { color: var(--ink-bright); }
+.msg.assistant em { color: var(--gold); }
+
+.msg.system {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+  max-width: 100%;
+}
+
+.typing {
+  display: inline-flex; gap: 4px; padding: 6px 0;
+}
+
+.typing span {
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: blink 1.4s infinite;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+/* Chat input */
+.chat-input-bar {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--ink-bright);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  min-height: 40px;
+  max-height: 100px;
+  transition: border-color 0.3s;
+}
+
+.chat-input:focus { border-color: var(--gold); }
+
+.send-btn {
+  width: 40px; height: 40px;
+  background: var(--red);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.send-btn:hover { background: #c93e34; }
+.send-btn:active { transform: scale(0.92); }
+.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (min-width: 768px) {
+  .app { max-width: 600px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-logo">
+      <div class="logo-icon">♟</div>
+      <div class="logo-text">Strat<span>Mind</span></div>
+    </div>
+    <span style="font-family:var(--font-mono);font-size:9px;color:var(--ink-dim);letter-spacing:2px;">v1.0</span>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" data-panel="library">Biblioteca</button>
+    <button class="tab" data-panel="chat">Consultor IA</button>
+  </div>
+
+  <!-- LIBRARY PANEL -->
+  <div class="panel active" id="library">
+    <div class="library-search">
+      <input class="search-input" type="text" placeholder="Buscar principio, autor, concepto..." id="searchInput">
+    </div>
+    <div class="library-content" id="libraryContent">
+
+      <!-- SUN TZU -->
+      <div class="module-card" data-search="sun tzu guerra arte engaño invencibilidad terreno velocidad agua forma">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag clasicos">Clásicos</span>
+          <span class="module-title">Sun Tzu · El Arte de la Guerra</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">01</span> La guerra es de vital importancia. Valorar: <strong>doctrina, tiempo, terreno, mando, disciplina.</strong></div>
+          <div class="principle"><span class="principle-num">02</span> <em>El arte se basa en el engaño.</em> Aparenta incapacidad cuando puedes atacar. Cerca, parece lejos.</div>
+          <div class="principle"><span class="principle-num">03</span> <em>Sé rápido como el trueno.</em> La persistencia no es beneficiosa — la victoria lo es.</div>
+          <div class="principle"><span class="principle-num">04</span> <strong>Ganar sin combatir</strong> es la suprema excelencia. Atacar planes > alianzas > ejércitos > ciudades.</div>
+          <div class="principle"><span class="principle-num">05</span> <em>Conócete y conoce al enemigo</em> — en 100 batallas no correrás peligro.</div>
+          <div class="principle"><span class="principle-num">06</span> <strong>La invencibilidad está en uno mismo.</strong> Hazte invencible primero, después busca vulnerabilidades.</div>
+          <div class="principle"><span class="principle-num">07</span> <em>Victoria primero, batalla después.</em> Un ejército victorioso gana antes de pelear.</div>
+          <div class="principle"><span class="principle-num">08</span> Sé como el agua — evita lo lleno, ataca lo vacío. <em>La victoria no es repetitiva, adapta su forma.</em></div>
+          <div class="principle"><span class="principle-num">09</span> La energía de la mañana es ardiente, la del mediodía decae, la de la noche se retira. <em>Domina la energía.</em></div>
+          <div class="principle"><span class="principle-num">10</span> <em>Recuerda el peligro en tiempos de seguridad.</em> Evita el caos antes de que tenga forma.</div>
+        </div>
+      </div>
+
+      <!-- 36 ESTRATAGEMAS -->
+      <div class="module-card" data-search="36 estratagemas chinas engaño indirecto maniobra wei zhao cuchillo prestado">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag clasicos">Clásicos</span>
+          <span class="module-title">Las 36 Estratagemas Chinas</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">#1</span> <strong>Cruzar el mar confundiendo al cielo</strong> — Lo familiar no provoca atención. Oculta lo importante en lo obvio.</div>
+          <div class="principle"><span class="principle-num">#2</span> <strong>Sitiar Wei para salvar Zhao</strong> — Ataque indirecto. Golpea el punto débil, no el fuerte.</div>
+          <div class="principle"><span class="principle-num">#3</span> <strong>Matar con cuchillo prestado</strong> — Usa recursos ajenos en provecho propio.</div>
+          <div class="principle"><span class="principle-num">#4</span> <strong>Esperar descansado al enemigo fatigado</strong> — Conserva energía mientras el otro se desgasta.</div>
+          <div class="principle"><span class="principle-num">#10</span> <strong>Ocultar la daga tras la sonrisa</strong> — Ganar confianza, actuar cuando baje la guardia.</div>
+          <div class="principle"><span class="principle-num">#15</span> <strong>Atraer al tigre fuera de la montaña</strong> — Saca al adversario de su terreno favorable.</div>
+          <div class="principle"><span class="principle-num">#16</span> <strong>Para capturar, primero dejar escapar</strong> — La presión extrema genera resistencia desesperada.</div>
+          <div class="principle"><span class="principle-num">#17</span> <strong>Lanzar un ladrillo para atraer jade</strong> — Ofrecer algo menor para obtener algo mayor.</div>
+        </div>
+      </div>
+
+      <!-- MUSASHI + GRACIÁN -->
+      <div class="module-card" data-search="musashi gracian prudencia anillos montaña mar corazón moderación">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag clasicos">Clásicos</span>
+          <span class="module-title">Musashi · Gracián · Sabiduría Práctica</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">M1</span> <strong>Grande y pequeño:</strong> En medio de los detalles, cambia a una vasta perspectiva. Y viceversa.</div>
+          <div class="principle"><span class="principle-num">M2</span> <strong>Montaña y mar:</strong> <em>No repitas lo mismo tres veces.</em> Cambia abruptamente de táctica.</div>
+          <div class="principle"><span class="principle-num">M3</span> <strong>Eliminar el corazón:</strong> Cuando el adversario mantiene esperanza aunque parezca derrotado, haz que se sienta derrotado desde el fondo.</div>
+          <div class="principle"><span class="principle-num">G1</span> <strong>Conocer su mejor cualidad</strong> y cultivarla con especial esmero.</div>
+          <div class="principle"><span class="principle-num">G2</span> <em>Hacer y hacer parecer</em> — las cosas no pasan por lo que son sino por lo que parecen.</div>
+          <div class="principle"><span class="principle-num">G3</span> <strong>Retirarse cuando se lleva ventaja.</strong> El saber retirarse a tiempo da la ventaja de haber sido siempre afortunado.</div>
+          <div class="principle"><span class="principle-num">G4</span> <em>No cansar.</em> Lo bueno, si breve, dos veces bueno.</div>
+        </div>
+      </div>
+
+      <!-- TEORÍA DE JUEGOS -->
+      <div class="module-card" data-search="dixit nalebuff nash juegos dilema prisionero amenaza promesa negociación equilibrio credibilidad">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag juegos">Juegos</span>
+          <span class="module-title">Dixit & Nalebuff · Teoría de Juegos</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">01</span> <strong>Mira hacia delante, razona hacia atrás.</strong> Anticipa respuestas futuras antes de decidir.</div>
+          <div class="principle"><span class="principle-num">02</span> <em>Siempre hay un juego mayor.</em> Nunca evalúes una decisión en aislamiento.</div>
+          <div class="principle"><span class="principle-num">03</span> <strong>Regla de oro estratégica:</strong> Entiende al otro desde SU perspectiva — sus gustos pueden ser diferentes.</div>
+          <div class="principle"><span class="principle-num">04</span> Cooperar NO es debilidad — <em>es estrategia óptima cuando el juego se repite.</em></div>
+          <div class="principle"><span class="principle-num">05</span> Tres jugadas: <strong>compromisos</strong> (irrevocables), <strong>amenazas</strong> (castigo si no coopera), <strong>promesas</strong> (recompensa si coopera).</div>
+          <div class="principle"><span class="principle-num">06</span> <em>Una amenaza exitosa NUNCA se cumple</em> — el otro cambia de conducta.</div>
+          <div class="principle"><span class="principle-num">07</span> 8 vías de credibilidad: contratos, reputación, quemar barcos, ir poquito a poco, trabajo en equipo.</div>
+          <div class="principle"><span class="principle-num">08</span> <strong>BATNA</strong> — tu poder de negociación es tu mejor alternativa a un acuerdo negociado.</div>
+        </div>
+      </div>
+
+      <!-- SENGE -->
+      <div class="module-card" data-search="senge quinta disciplina sistemas arquetipos leyes feedback apalancamiento crecimiento carga">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag sistemas">Sistemas</span>
+          <span class="module-title">Senge · Pensamiento Sistémico</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">L1</span> <strong>Los problemas de hoy derivan de las "soluciones" de ayer.</strong></div>
+          <div class="principle"><span class="principle-num">L2</span> <em>Cuanto más presionas, más presiona el sistema.</em> Realimentación compensadora.</div>
+          <div class="principle"><span class="principle-num">L3</span> La conducta <strong>mejora antes de empeorar</strong> — las soluciones fáciles son seductoras.</div>
+          <div class="principle"><span class="principle-num">L7</span> <em>Causa y efecto no están próximos en tiempo y espacio.</em></div>
+          <div class="principle"><span class="principle-num">L8</span> <strong>Cambios pequeños, resultados grandes</strong> — pero las zonas de apalancamiento son las menos obvias.</div>
+          <div class="principle"><span class="principle-num">L11</span> <em>No hay culpa.</em> Tú y la causa de tus problemas sois parte del mismo sistema.</div>
+          <div class="principle"><span class="principle-num">A1</span> <strong>Límites del crecimiento:</strong> Actuar sobre el factor limitante, no presionar el acelerador.</div>
+          <div class="principle"><span class="principle-num">A2</span> <strong>Desplazamiento de la carga:</strong> La solución sintomática debilita la solución fundamental.</div>
+        </div>
+      </div>
+
+      <!-- TALEB -->
+      <div class="module-card" data-search="taleb antifrágil opcionalidad haltera vía negativa cisne negro skin game convexidad fragilidad">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag antifragil">Antifragilidad</span>
+          <span class="module-title">Taleb · Antifrágil</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">01</span> <strong>Tríada:</strong> Frágil (se rompe) → Robusto (resiste) → <em>Antifrágil (mejora con estrés).</em></div>
+          <div class="principle"><span class="principle-num">02</span> <strong>Opcionalidad:</strong> Es más valioso tener opciones que tener razón.</div>
+          <div class="principle"><span class="principle-num">03</span> <strong>Haltera:</strong> 90% ultra-seguro + 10% ultra-agresivo. <em>Nada en el medio.</em></div>
+          <div class="principle"><span class="principle-num">04</span> <strong>Vía negativa:</strong> Antes de agregar, pregunta qué puedes <em>eliminar.</em></div>
+          <div class="principle"><span class="principle-num">05</span> <strong>Skin in the game:</strong> No confíes en quien no sufre consecuencias de sus decisiones.</div>
+          <div class="principle"><span class="principle-num">06</span> <strong>Cisne negro:</strong> No predicir — reducir exposición a negativos, aumentar a positivos.</div>
+          <div class="principle"><span class="principle-num">07</span> <strong>Procrastinación fabiana:</strong> A veces la mejor acción es NO actuar.</div>
+          <div class="principle"><span class="principle-num">08</span> <strong>Convexidad:</strong> Busca configuraciones donde upside >> downside.</div>
+        </div>
+      </div>
+
+      <!-- PÉREZ + LOEHR -->
+      <div class="module-card" data-search="pérez estratega AAA anticipación adaptación acción E1 E2 E3 E4 E5 tobogán loehr energía ritual IPS YODA">
+        <div class="module-header" onclick="toggleModule(this)">
+          <span class="module-tag core">Core</span>
+          <span class="module-title">Pérez · AAA + Loehr · Rendimiento</span>
+          <span class="module-arrow">›</span>
+        </div>
+        <div class="module-body">
+          <div class="principle"><span class="principle-num">AAA</span> <strong>Anticipación + Adaptación + Acción > Incertidumbre</strong></div>
+          <div class="principle"><span class="principle-num">E1</span> No Razonable — Acción sin preparación. Contexto: startups.</div>
+          <div class="principle"><span class="principle-num">E2</span> Solucionador — Adaptación pragmática. Contexto: pymes.</div>
+          <div class="principle"><span class="principle-num">E3</span> Profesional — Planificación + anticipación. Contexto: consolidadas.</div>
+          <div class="principle"><span class="principle-num">E4</span> Darwinista — Adaptación financiera radical. Contexto: reestructuración.</div>
+          <div class="principle"><span class="principle-num">E5</span> Del Cambio — Acción transformadora, plataformas. <em>Contexto: digital, biotech.</em></div>
+          <div class="principle"><span class="principle-num">TOB</span> <strong>Tobogán:</strong> Estrategia → Complacencia → Inercia → Rigidez → No-Estrategia</div>
+          <div class="principle"><span class="principle-num">IPS</span> <strong>4 energías:</strong> Física (cantidad) + Emocional (calidad) + Mental (foco) + Espiritual (fuerza).</div>
+          <div class="principle"><span class="principle-num">YDA</span> <strong>Y.O.D.A.:</strong> ¿Mi emoción distorsiona? ¿Voz interior: crítico o coach? ¿Consistente con credo?</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="panel" id="chat">
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg system">StratMind · Consultor Estratégico con IA · Cruzo Sun Tzu, Taleb, Senge, Dixit y Pérez para analizar tu situación</div>
+    </div>
+    <div class="chat-input-bar">
+      <textarea class="chat-input" id="chatInput" placeholder="Describe tu situación estratégica..." rows="1"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">→</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══ TAB NAVIGATION ═══
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+  });
+});
+
+// ═══ MODULE TOGGLE ═══
+function toggleModule(header) {
+  const card = header.parentElement;
+  card.classList.toggle('open');
+}
+
+// ═══ SEARCH ═══
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.module-card').forEach(card => {
+    const searchable = (card.dataset.search + ' ' + card.textContent).toLowerCase();
+    card.style.display = searchable.includes(q) ? 'block' : 'none';
+    if (q.length > 2) {
+      card.classList.add('open');
+    } else if (q.length === 0) {
+      card.classList.remove('open');
+    }
+  });
+});
+
+// ═══ CHAT WITH AI ═══
+const SYSTEM_PROMPT = `Eres StratMind, un consultor estratégico personal para Maverick — ingeniero de desarrollo de producto con casi 30 años de experiencia en automoción (Grupo Segura), especialista en CATIA V5 y additive manufacturing, en transición hacia AI Solutions Expert.
+
+Tu conocimiento integra 6 módulos de pensamiento estratégico que DEBES cruzar en cada análisis:
+
+MÓDULO 1 — CORE (Rafael Alberto Pérez + Loehr):
+- Fórmula AAA: Anticipación + Adaptación + Acción > Incertidumbre
+- 5 Estrategas: E1 (acción sin mapa), E2 (adaptación pragmática), E3 (planificación), E4 (darwinismo financiero), E5 (acción transformadora). Maverick es E2/E3 evolucionando a E5.
+- Toboganes: Estrategia → Complacencia → Inercia → Rigidez → No-Estrategia
+- Rendimiento: 4 energías (física, emocional, mental, espiritual), IPS, rituales > motivación, Y.O.D.A.
+
+MÓDULO 2 — CLÁSICOS (Sun Tzu, 36 Estratagemas, Musashi, Clausewitz, Maquiavelo, Gracián):
+- Ganar sin combatir es la suprema excelencia
+- El arte se basa en el engaño (gestión de percepciones)
+- La invencibilidad está en uno mismo
+- Victoria primero, batalla después
+- Sé como el agua — adapta tu forma al terreno
+- 36 Estratagemas: maniobra indirecta, usar recursos ajenos, esperar descansado
+- Musashi: cambiar escala, no repetir, eliminar la esperanza del adversario
+- Gracián: hacer y hacer parecer, retirarse con ventaja, no cansar
+
+MÓDULO 3 — TEORÍA DE JUEGOS (Dixit & Nalebuff):
+- Mira hacia delante, razona hacia atrás
+- Siempre hay un juego mayor
+- Compromisos, amenazas, promesas — jugadas estratégicas
+- Una amenaza exitosa nunca se cumple
+- 8 vías de credibilidad
+- Cooperar es óptimo cuando el juego se repite
+- BATNA: tu poder es tu mejor alternativa
+
+MÓDULO 4 — SISTEMAS (Senge):
+- 11 leyes del pensamiento sistémico
+- Los problemas de hoy = soluciones de ayer
+- Cuanto más presionas, más presiona el sistema
+- 5 arquetipos: límites del crecimiento, desplazamiento de la carga, crecimiento y subinversión
+- El apalancamiento nunca está donde parece
+
+MÓDULO 5 — ANTIFRAGILIDAD (Taleb):
+- Tríada: frágil → robusto → antifrágil
+- Opcionalidad > predicción
+- Haltera: 90% conservador + 10% agresivo, nada en el medio
+- Vía negativa: eliminar > agregar
+- Skin in the game: no confíes en quien no sufre consecuencias
+- Cisnes negros: no predecir, prepararse
+- Procrastinación fabiana: a veces NO actuar es la mejor estrategia
+
+PROTOCOLES RÁPIDOS:
+- Pre-Mortem: imagina que fracasó, lista 5 razones, mitiga
+- Red Team: adopta perspectiva del adversario, busca puntos débiles
+- OODA: Observar → Orientar → Decidir → Actuar → Repetir
+- Cynefin: Claro (mejores prácticas) / Complicado (expertos) / Complejo (sondear-percibir-responder) / Caótico (actuar primero)
+
+INSTRUCCIONES DE RESPUESTA:
+1. Siempre cruza al menos 2 módulos en tu análisis
+2. Sé concreto y operativo — principios aplicados, no teoría abstracta
+3. Usa el formato: diagnóstico breve → análisis multinivel → movimientos concretos
+4. Conecta con el contexto profesional de Maverick (Grupo Segura, automoción, clientes Volvo/Stellantis, transición IA)
+5. Responde en español
+6. Sé directo, sin florituras — como un consejero de confianza que no endulza`;
+
+let chatHistory = [];
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  // Add user message
+  addMessage('user', msg);
+  input.value = '';
+  input.style.height = 'auto';
+  
+  // Disable send
+  document.getElementById('sendBtn').disabled = true;
+
+  // Show typing
+  const typingEl = addMessage('assistant', '<div class="typing"><span></span><span></span><span></span></div>');
+
+  chatHistory.push({ role: 'user', content: msg });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Error en la respuesta. Inténtalo de nuevo.';
+    
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    // Replace typing with response
+    typingEl.innerHTML = formatResponse(reply);
+  } catch (err) {
+    typingEl.innerHTML = 'Error de conexión. Verifica tu acceso a la API.';
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  scrollChat();
+}
+
+function addMessage(role, content) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = role === 'user' ? escapeHtml(content) : content;
+  container.appendChild(div);
+  scrollChat();
+  return div;
+}
+
+function scrollChat() {
+  const c = document.getElementById('chatMessages');
+  setTimeout(() => c.scrollTop = c.scrollHeight, 50);
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function formatResponse(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+// Auto-resize textarea
+document.getElementById('chatInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+
+// Enter to send (shift+enter for new line)
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg => console.log('SW registered:', reg.scope))
+    .catch(err => console.log('SW registration failed:', err));
+}
+</script>
+</body>
+</html>
